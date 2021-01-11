@@ -41,7 +41,7 @@ class Controller
 
   def finish_recipe
     puts "Here is the completed entry: \n\n"
-    ap @ingredient_list
+    pp @ingredient_list
     puts "Sending recipe to EDAMAM's nutrition analyzer. Please stand by..."
     self.fetch
   end
