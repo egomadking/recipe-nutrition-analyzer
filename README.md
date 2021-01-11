@@ -3,9 +3,11 @@
 Ruby CLI tool to get nutritional information for a recipe from EDAMAM's nutrition analysis API
 
 TOC
-   [Intallation](#installation)
-   [Usage](#usage)
-   [Contribution](#contribution)
+
+- [recipe-nutrition-analyzer](#recipe-nutrition-analyzer)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Contribution](#contribution)
 
 ## Installation
 
