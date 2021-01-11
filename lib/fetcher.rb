@@ -31,8 +31,4 @@ class Fetcher
     @controller.response(response)
   end
 
-  def fakeRequest
-
-  end
-
 end 
