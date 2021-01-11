@@ -84,7 +84,7 @@ attr_reader :weights, :volumes
     total.each do |key, val|
       if key != "ENERC_KCAL" && key != "WATER" && key != "FATRN" && key != "FAMS" && key !="FAPU" && key != "SUGAR" && key != "FOLFD" && key != "FOLAC"
       
-        absolute  = "#{(val['label']}: #{val['quantity']/@yield).round(1)} #{val['unit']}"
+        absolute  = "#{val['label']}: #{(val['quantity']/@yield ).round(1)} #{val['unit']}"
         rda = "#{(daily[key]['quantity']/@yield).round(1)}%"
         line_length = absolute.length + rda.length
         dots = ""
@@ -94,7 +94,7 @@ attr_reader :weights, :volumes
         line_length.times { dots << "."}
         puts "#{absolute}#{dots}#{rda}"
       elsif key == "FATRN" || key == "FAMS" || key == "FAPU" || key == "SUGAR"
-        puts "#{(val['label']}: #{val['quantity']/@yield).round(1)} #{val['unit']}...BOOO!!"
+        puts "#{val['label']}: #{(val['quantity']/@yield).round(1)} #{val['unit']}...BOOO!!"
       end
     end
   end
