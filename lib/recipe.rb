@@ -1,7 +1,7 @@
 class Recipe
   attr_accessor :name, :ingredients, :serves, :nutrition_info
 
-  @@all
+  @@all = []
 
   def initialize(name)
     @name = name
