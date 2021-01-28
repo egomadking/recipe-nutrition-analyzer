@@ -1,12 +1,14 @@
-# recipe-nutrition-analyzer
+recipe-nutrition-analyzer
 
 Ruby CLI tool to get nutritional information for a recipe from EDAMAM's nutrition analysis API
 
 TOC
 
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Contribution](#contribution)
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contribution](#contribution)
+- [Next steps](#next-steps)
 
 ## Installation
 
@@ -40,3 +42,13 @@ Bottom line: I will be a kind human. Please be the same in return.
 This is an early work in progress so I will be actively making changes. As such, please submit a contribution idea through opening an issue before working on a pull request. Don't submit a pull request at this unless it has been discussed through an issue ticket. I happily respond to all contructive inquiries.
 
 As this project evolves, I will update this readme and how contributions are accepted.
+
+## Next steps
+
+- allow for recipe editing prior to competion
+- confirm recipe ingredients before sending
+- on completion, prompt to create new or exit
+- on band responses, prompt to create new or exit
+- allow user to see previous nutritional results
+- scrape r-recipe microformatted pages for recipe list
+- persist results to database
