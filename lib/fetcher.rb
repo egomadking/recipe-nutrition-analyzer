@@ -10,10 +10,9 @@ class Fetcher
     @url = "https://api.edamam.com/api/nutrition-details?app_id=#{@ID}&app_key=#{@KEY}"
   end
 
-  def self.init_and_send(controller)
+  def self.init_and_send(req_body)
     fetcher = self.new
-    fetcher.controller = controller
-    fetcher.req_body = controller.req_body
+    fetcher.req_body = req_body
     fetcher.request
   end
   
@@ -28,7 +27,6 @@ class Fetcher
     request.body = @req_body.to_json
 
     response = https.request(request)
-    @controller.response(response)
   end
 
 end 
