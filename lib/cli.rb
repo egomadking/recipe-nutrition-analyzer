@@ -1,67 +1,113 @@
 class CLI
-
-attr_accessor :start_resp
+  
+  def quit
+    puts "Good bye!".bold
+    exit
+  end
 
   def greet_user
-    puts "Welcome to the Nutrition Analyzer. You can get nutritional info from a list of ingredients. \n\n"
-    #@recipe_name = self.prompt_for_recipe_name
+    puts "                                                                 ".black.on_green
+    puts "                    The Nutrition Analyzer.                      ".black.on_green
+    puts "  This tool provides nutrition info from a list of ingredients.  ".black.on_green
+    puts "                                                                 ".black.on_green
+    puts "\n"
     recipe = Recipe.new(self.prompt_for_recipe_name)
     recipe.serves = self.prompt_for_yield
     self.prompt_for_ingredient(recipe)
   end
   
   def prompt_for_recipe_name
-    puts "Please enter a recipe name:"
+    puts "Please enter a recipe name to get started:"
     title = gets.chomp
-    title.length <=0 ? self.prompt_for_recipe_name : title
+    if title == "exit"
+      self.quit
+    end
+      title.length <=0 ? self.prompt_for_recipe_name : title
   end
 
   def prompt_for_yield
-    puts "Please enter the number this recipe serves"
-    serves = gets.chomp.to_i
-    serves <= 0 ? self.prompt_for_yield : serves
+    puts "Number of servings for this recipe:"
+    serves = gets.chomp
+    if serves == "exit"
+      self.quit
+    elsif  serves == serves.to_i.to_s
+      serves.to_i
+    else
+      self.prompt_for_yield
+    end
+
   end
 
   def prompt_for_ingredient(recipe)
+    if recipe.ingredients.length == 0
+      puts "\nType:".bold
+      self.print_help
+      puts "    -or- \n\n"
+      puts "Enter ingredient using the following format (exclude quotes): " + "\"qty\" \"unit_of_measure ingredient\"".cyan.bold + " -or- " + "\"count\" \"ingredient\".".cyan.bold
+    else
+      puts "Enter next ingredient:"
+    end
+    input = gets.chomp
     puts "\n"
-    puts 'Enter ingredient using the following format (exclude quotes): "qty" "unit_of_measure ingredient" -or- "count" "ingredient".'
-    puts "Type \"help\" to see measurement abbreviations or \"example\" to see an example entry. Type \"finished\" to complete recipe.\n\n"
-    unvalidated_ingredient = gets.chomp
-    self.validate_ingredient(unvalidated_ingredient, recipe)
-    #@controller.validate_ingredient(@ingredient_from_cli)
+    self.process_ingredient_input(input, recipe)
   end
 
-  def validate_ingredient(ingredient, recipe)
-    
-    ingredient = ingredient.downcase
-    if ingredient == "exit"
-      puts "Good bye!"
-    elsif ingredient == "help" || ingredient == "example"
-      user_help_message("ingredient_#{ingredient}")
-    elsif ingredient == "finished"
-      self.finish_recipe(recipe)
+  def print_ingredients(recipe)
+    puts "#{recipe.name}".green.bold
+    recipe.name.length.times {print "-".green}
+    puts " "
+    puts "Serves: #{recipe.serves}".green.italic
+    recipe.ingredients.each do |i|
+      puts "#{i}".green
+    end
+    puts "\n"
+  end
 
-      #need to validate the ingredient within the recipe object
+  def print_help
+    puts "\"HELP\"".cyan.bold + " for help options"
+    puts "\"MEASURES\"".cyan.bold + " to see measurement abbreviations"
+    puts "\"EXAMPLE\"".cyan.bold + " to see an example entry"
+    puts "\"LIST RECIPE\"".cyan.bold + " to see all ingredients already entered"
+    puts "\"FINISHED\"".cyan.bold + " to complete recipe"
+    puts "\n"
+  end
+
+  def process_ingredient_input(input, recipe)
+    
+    input = input.downcase
+    if input == "exit"
+      self.quit
+    elsif input == "measures" || input == "example"
+      help_message("ingredient_#{input}", recipe)
+    elsif input == "finished"
+      self.finish_recipe(recipe)
+    elsif input == "list recipe"
+      self.print_ingredients(recipe)
+      prompt_for_ingredient(recipe)
+    elsif input == "help"
+      self.print_help
+      prompt_for_ingredient(recipe)
     else
-      validated = recipe.validate_ingredient(ingredient)
+      validated = recipe.validate_ingredient(input)
       if validated
         prompt_for_ingredient(recipe)
       else
-        user_help_message("ingredient_reject")
+        help_message("ingredient_reject", recipe)
       end
 
     end
     
   end
 
+  #TODO: confirm recipe ingredients
   def finish_recipe(recipe)
-    puts "Here is the completed entry: \n\n"
-    pp @ingredient_list
+    puts "Here is the completed entry: \n\n".bold
+    self.print_ingredients(recipe)
     puts "Sending recipe to EDAMAM's nutrition analyzer. Please stand by..."
     error = recipe.fetch
 
     if error
-      user_help_message(error)
+      help_message(error)
     else
       print_nutrition_info(recipe)
     end
@@ -69,31 +115,28 @@ attr_accessor :start_resp
   end
   
 
-  def user_help_message(type)
+  #TODO: status errors: prompt for exit or start from beginning
+  def help_message(type, recipe = nil)
     case type
-    when "ingredient_help"
-      puts "\n\nWeights: #{["mg", "gr", "oz", "lbs"]join(', ')} Volumes: #{["ml", "l", "tsp", "tbsp", "c"].join(', ')}.\n\n"
-      self.prompt_for_ingredient
+    when "ingredient_measures"
+      puts "\n" + "Weights: mg, gr, oz, lbs ||| Volumes: ml, l, tsp, tbsp, c.".cyan.bold + "\n\n"
+      self.prompt_for_ingredient(recipe)
     when "ingredient_example"
-      puts "\n\n\"3 tbsp brown sugar\" -or- \"1 carrot\" -or- \"1/2 medium onion\"\n\n"
-      self.prompt_for_ingredient
+      puts "\n\"" + "3 tbsp brown sugar\" -or- \"1 carrot\" -or- \"1/2 medium onion".cyan.bold + "\"\n\n"
+      self.prompt_for_ingredient(recipe)
     when "ingredient_reject"
-      puts "validate_ingredient ELSE TRIGGERED by #{@ingredient_from_cli}"
-      puts "\n\nThe last entry was invalid. Please try again...\n\n"
-      self.prompt_for_ingredient
-    when "url_mistyped"
-      puts "\"#{@start_resp}\" invalid response. Please enter \"site\" or \"recipe\". To quit, type \"exit\"."
-      @start_resp = gets.chomp
-      self.select_workflow
+      puts "\n\n" + "The last ingredient was invalid. Please try again...".red.bold + "\n\n"
+      self.prompt_for_ingredient(recipe)
     when "response_404"
-      puts "The service is not found. Please try again later."
+      puts "The service cannot be found. Please ensure you have an internet connection or try again later.".red.bold
     when "response_422", "response_555"
-      puts "the service could not processess the recipe. Please try again ensuring that you spell all ingredients properly"
+      puts "The service could not processess the recipe. Please try again ensuring that you spell all ingredients properly".red.bold
     when "response_other"
-      puts "The service errored out. Ensure that your APP_KEY and AP_ID are correct."
+      puts "The service errored out. If you installed this locally, ensure that your APP_KEY and AP_ID are correct.".red.bold
     end
   end
 
+  #TODO: prompt for exit or start from beginning
   def print_nutrition_info(recipe)
 
     info = recipe.nutrition_info
@@ -101,7 +144,7 @@ attr_accessor :start_resp
     total = info["totalNutrients"]
     daily = info["totalDaily"]
     print"\n"
-    puts "Recipe Nutrition Info"
+    puts "Recipe Nutrition Info".blue.bold
     puts "#{info["yield"]} servings"
     puts "Calories per serving: #{(total["ENERC_KCAL"]["quantity"]/recipe.serves).round(0)}"
     50.times { print "-"}
@@ -124,9 +167,13 @@ attr_accessor :start_resp
         line_length.times { dots << "."}
         puts "#{absolute}#{dots}#{rda}"
       elsif key == "FATRN" || key == "FAMS" || key == "FAPU" || key == "SUGAR"
-        puts "#{val['label']}: #{(val['quantity']/recipe.serves).round(1)} #{val['unit']}...BOOO!!"
+        puts "#{val['label']}: #{(val['quantity']/recipe.serves).round(1)} #{val['unit']}"
       end
     end
   end
+
+  #TODO: #reset
+  #TODO: #start_new
+  #TODO: #fix_ingredients
 
 end
