@@ -1,8 +1,7 @@
 class Fetcher
   # "https://api.edamam.com/api/nutrition-details?app_id=${YOUR_APP_ID}&app_key=${YOUR_APP_KEY}"
 
-  attr_accessor :url, :response, :req_body, :controller
-  # attr_reader :APP_KEY, :APP_KEY
+  attr_accessor :url, :response, :req_body
 
   def initialize
     @KEY = ENV["API_KEY"]
