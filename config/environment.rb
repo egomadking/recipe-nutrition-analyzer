@@ -4,6 +4,7 @@ require 'json'
 require 'uri'
 require 'dotenv'
 require 'pry'
+require 'colorize'
 
 Bundler.require
 
